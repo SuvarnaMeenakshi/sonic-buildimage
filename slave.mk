@@ -192,6 +192,10 @@ ifeq ($(BUILD_LOG_TIMESTAMP),)
 override BUILD_LOG_TIMESTAMP := $(DEFAULT_BUILD_LOG_TIMESTAMP)
 endif
 
+ifeq ($(NUM_ASIC),)
+override NUM_ASIC := $(DEFAULT_NUM_ASIC)
+endif
+
 MAKEFLAGS += -j $(SONIC_BUILD_JOBS)
 export SONIC_CONFIG_MAKE_JOBS
 
@@ -214,6 +218,9 @@ $(info Build Configuration)
 $(info "CONFIGURED_PLATFORM"             : "$(if $(PLATFORM),$(PLATFORM),$(CONFIGURED_PLATFORM))")
 $(info "CONFIGURED_ARCH"                 : "$(if $(PLATFORM_ARCH),$(PLATFORM_ARCH),$(CONFIGURED_ARCH))")
 $(info "SONIC_CONFIG_PRINT_DEPENDENCIES" : "$(SONIC_CONFIG_PRINT_DEPENDENCIES)")
+ifeq ($(NUM_ASIC),1)
+$(info "NUM_ASIC"                        : "$(NUM_ASIC)")
+endif
 $(info "SONIC_BUILD_JOBS"                : "$(SONIC_BUILD_JOBS)")
 $(info "SONIC_CONFIG_MAKE_JOBS"          : "$(SONIC_CONFIG_MAKE_JOBS)")
 $(info "SONIC_USE_DOCKER_BUILDKIT"       : "$(SONIC_USE_DOCKER_BUILDKIT)")
