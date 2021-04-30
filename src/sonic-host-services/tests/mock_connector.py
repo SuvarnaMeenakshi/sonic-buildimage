@@ -1,6 +1,7 @@
 class MockConnector(object):
     STATE_DB = None
-    data = {}
+    CONFIG_DB = None
+    data = {"MGMT_PORT|eth1": {"description": "snowflake", "admin_status": "up"}}
 
     def __init__(self, host):
         pass
@@ -8,8 +9,15 @@ class MockConnector(object):
     def connect(self, db_id):
         pass
 
+    def delete_all_by_pattern(self, db_name, pattern):
+        pass
+
     def get(self, db_id, key, field):
         return MockConnector.data[key][field]
+
+    def set(self, db_id, key, field, val):
+        MockConnector.data[key] = {}
+        MockConnector.data[key][field] = val
 
     def keys(self, db_id, pattern):
         match = pattern.split('*')[0]

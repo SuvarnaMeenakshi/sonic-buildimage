@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime
+from sonic_py_common import device_info
 
 from sonic_py_common import daemon_base
 import swsssdk
@@ -23,10 +24,32 @@ REDIS_HOSTIP = "127.0.0.1"
 
 class ProcDockerStats(daemon_base.DaemonBase):
 
+    if_operstate_file = "/sys/class/net/{}/operstate"
     def __init__(self, log_identifier):
         super(ProcDockerStats, self).__init__(log_identifier)
+        self.mgmt_interfaces = []
         self.state_db = swsssdk.SonicV2Connector(host=REDIS_HOSTIP)
         self.state_db.connect("STATE_DB")
+        self.init_mgmt_if_oper_status()
+
+    def init_mgmt_if_oper_status(self):
+        self.state_db.connect("CONFIG_DB")
+        mgmt_interfaces =  self.state_db.keys(self.state_db.CONFIG_DB, "MGMT_PORT|*")
+        for intf in mgmt_interfaces:
+            self.mgmt_interfaces.append(intf.split("MGMT_PORT|")[1])
+        self.state_db.delete_all_by_pattern(self.state_db.STATE_DB, "MGMT_PORT_TABLE|*" )
+        self.set_mgmt_oper_status()
+
+    def set_mgmt_oper_status(self):
+        for intf in self.mgmt_interfaces:
+            status = "down"
+            if_operstate_file = self.if_operstate_file.format(intf)
+            if os.path.exists(if_operstate_file):
+                file = open(if_operstate_file, "r")
+                if file is not None:
+                    status = file.readline().strip()
+            config_db_name = "MGMT_PORT_TABLE|" + intf
+            self.state_db.set(self.state_db.STATE_DB, config_db_name, "oper_status",  status)
 
     def run_command(self, cmd):
         proc = subprocess.Popen(cmd, shell=True, universal_newlines=True, stdout=subprocess.PIPE)
@@ -179,6 +202,9 @@ class ProcDockerStats(daemon_base.DaemonBase):
             self.update_state_db('DOCKER_STATS|LastUpdateTime', 'lastupdate', str(datetimeobj))
             self.update_processstats_command()
             self.update_state_db('PROCESS_STATS|LastUpdateTime', 'lastupdate', str(datetimeobj))
+
+            if device_info.is_multi_npu():
+                self.set_mgmt_oper_status()
 
             # Data need to be updated every 2 mins. hence adding delay of 120 seconds
             time.sleep(120)

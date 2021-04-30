@@ -1,6 +1,7 @@
 import sys
 import os
 import pytest
+import mock
 
 import swsssdk
 from sonic_py_common.general import load_module_from_source
@@ -13,6 +14,7 @@ test_path = os.path.dirname(os.path.abspath(__file__))
 modules_path = os.path.dirname(test_path)
 scripts_path = os.path.join(modules_path, "scripts")
 sys.path.insert(0, modules_path)
+mgmt_iface_status = test_path + "{}"
 
 # Load the file under test
 procdockerstatsd_path = os.path.join(scripts_path, 'procdockerstatsd')
@@ -41,3 +43,8 @@ class TestProcDockerStatsDaemon(object):
         for test_input, expected_output in test_data:
             res = pdstatsd.convert_to_bytes(test_input)
             assert res == expected_output
+
+    def test_mgmt_oper_status(self):
+        with mock.patch('procdockerstatsd.ProcDockerStats.if_operstate_file', mgmt_iface_status):
+            pdstatsd = procdockerstatsd.ProcDockerStats(procdockerstatsd.SYSLOG_IDENTIFIER)
+            assert pdstatsd.state_db.get_all(MockConnector.STATE_DB, "MGMT_PORT_TABLE|eth1") == {"oper_status": "down"}
