@@ -36,9 +36,11 @@ fi
 # OR could be PCI device ID's which will be strings like "03:00.0"
 # depending on what the SAI/SDK expects.
 asic_id=$(echo $SWSS_VARS | jq -r '.asic_id')
-if [ -n "$asic_id" ]
-then
-    ORCHAGENT_ARGS+="-i $asic_id "
+if [[ !("$platform"  == "vs") ]]; then
+    if [ -n "$asic_id" ]
+    then
+        ORCHAGENT_ARGS+="-i $asic_id "
+    fi
 fi
 
 # for multi asic platforms add the asic name to the record file names
