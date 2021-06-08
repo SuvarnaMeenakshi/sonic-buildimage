@@ -21,7 +21,11 @@ steps:
 - script: |
     set -x
     sudo mkdir -p /data/sonic-vm/images
-    sudo cp -v ../target/sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
+    if [ ${{ parameters.tbtype }} == "multi-asic-t1-lag" ]]; then
+      sudo cp -v ../target/sonic-multi-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
+    else
+      sudo cp -v ../target/sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
+    fi
     sudo gzip -fd /data/sonic-vm/images/sonic-vs.img.gz
     username=$(id -un)
     sudo chown -R $username.$username /data/sonic-vm
@@ -36,7 +40,7 @@ steps:
 
 - script: |
     rm -rf $(Build.ArtifactStagingDirectory)/*
-    docker exec sonic-mgmt bash -c "/data/sonic-mgmt/tests/kvmtest.sh -en -T ${{ parameters.tbtype }} ${{ parameters.tbname }} ${{ parameters.dut }}"
+    docker exec sonic-mgmt bash -c "/data/sonic-mgmt/tests/run_tests.sh -c bgp/test_bgp_fact.py -d ${{ parameters.dut }} -f $(testbed_file) -i $(inventory) -n ${{ parameters.tbname }} -e --disable_loganalyzer -u"
   displayName: "Run tests"
 
 - script: |
