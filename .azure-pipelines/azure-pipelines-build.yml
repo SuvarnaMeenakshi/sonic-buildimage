@@ -42,7 +42,6 @@ jobs:
           variables:
             dbg_image: yes
 
-      jobGroups:
         - name: multi-asic-vs
           variables:
             dbg_image: yes
