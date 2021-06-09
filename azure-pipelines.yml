@@ -28,6 +28,7 @@ stages:
       - name: multi-asic-vs
         variables:
           num_asic: 4
+          PLATFORM_AZP: vs
 
 - stage: Test
   variables:
