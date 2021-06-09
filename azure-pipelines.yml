@@ -85,7 +85,6 @@ stages:
         testRunTitle: vstest
 
   - job:
-    pool: sonictest-multi-asic-t1-lag
     displayName: "kvmtest-multi-asic-t1-lag"
     timeoutInMinutes: 240
 
