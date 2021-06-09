@@ -96,3 +96,4 @@ stages:
         tbname: vms-kvm-four-asic-t1-lag
         ptf_name: ptf_vms6-4
         tbtype: multi-asic-t1-lag
+        artifact: multi-asic-vs
