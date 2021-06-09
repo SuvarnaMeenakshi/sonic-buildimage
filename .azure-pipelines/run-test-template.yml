@@ -41,7 +41,7 @@ steps:
 - script: |
     rm -rf $(Build.ArtifactStagingDirectory)/*
     docker exec sonic-mgmt bash -c "/data/sonic-mgmt/tests/run_tests.sh -c bgp/test_bgp_fact.py -d ${{ parameters.dut }} -f $(testbed_file) -i $(inventory) -n ${{ parameters.tbname }} -e --disable_loganalyzer -u"
-  displayName: "Run tests"
+  displayName: "Run bgp fact test"
 
 - script: |
     # save dut state if test fails
