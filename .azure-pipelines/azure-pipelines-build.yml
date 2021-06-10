@@ -113,7 +113,7 @@ jobs:
             while [ $(asic_id) -le $(num_asic)" ]; do
                sudo echo DEV_ID_ASIC_$(asic_id)=$(asic_id) >> ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf
                asic_id=$(( $asic_id + 1 ))
-             done
+            done
             if [ $(dbg_image) == yes ]; then
               make $BUILD_OPTIONS INSTALL_DEBUG_TOOLS=y target/sonic-vs.img.gz && mv target/sonic-vs.img.gz target/sonic-masic-vs-dbg.img.gz
             fi
