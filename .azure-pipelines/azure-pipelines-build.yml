@@ -110,7 +110,7 @@ jobs:
           elif [ $(GROUP_NAME) == multi-asic-vs ]; then
             sudo echo NUM_ASIC=$(num_asic) > ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf
             asic_id=0
-            while [ $asic_id -le $num_asic ]; do
+            while [ $asic_id -le $(num_asic) ]; do
                sudo echo DEV_ID_ASIC_$(asic_id)=$(asic_id) >> ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf
                asic_id=$(( $asic_id + 1 ))
             done
