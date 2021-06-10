@@ -60,7 +60,7 @@ stages:
 
     - task: DownloadPipelineArtifact@2
       inputs:
-        artifact: sonic-buildimage.vs
+        artifact: sonic-buildimage.multi-asic-vs
       displayName: "Download sonic-buildimage.vs artifact"
 
     - script: |
