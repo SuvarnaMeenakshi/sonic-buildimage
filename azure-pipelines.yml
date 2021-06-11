@@ -43,6 +43,10 @@ stages:
       buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) ${{ variables.VERSION_CONTROL_OPTIONS }}'
       jobGroups:
       - name: vs
+      - name: multi-asic-vs
+        variables:
+          num_asic: 4
+          PLATFORM_AZP: vs
       - name: broadcom
         variables:
           swi_image: yes
