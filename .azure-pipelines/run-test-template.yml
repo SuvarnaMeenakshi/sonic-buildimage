@@ -22,7 +22,7 @@ steps:
     set -x
     sudo mkdir -p /data/sonic-vm/images
     if [[ ${{ parameters.tbtype }} == "multi-asic-t1-lag" ]]; then
-      sudo cp -v ../target/sonic-multi-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
+      sudo cp -v ../target/sonic-masic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
     else
       sudo cp -v ../target/sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
     fi
