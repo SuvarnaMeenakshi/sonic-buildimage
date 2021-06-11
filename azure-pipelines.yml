@@ -59,7 +59,7 @@ stages:
 
     - task: DownloadPipelineArtifact@2
       inputs:
-        artifact: sonic-buildimage.multi-asic-vs
+        artifact: sonic-buildimage.vs
       displayName: "Download sonic-buildimage.vs artifact"
 
     - script: |
@@ -96,4 +96,3 @@ stages:
         tbname: vms-kvm-four-asic-t1-lag
         ptf_name: ptf_vms6-4
         tbtype: multi-asic-t1-lag
-        artifact: multi-asic-vs
