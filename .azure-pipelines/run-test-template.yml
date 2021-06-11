@@ -7,8 +7,6 @@ parameters:
   type: string
 - name: ptf_name
   type: string
-- name: artifact
-  type: string
 
 steps:
 - checkout: self
