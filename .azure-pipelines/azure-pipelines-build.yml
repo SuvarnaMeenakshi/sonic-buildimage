@@ -41,12 +41,7 @@ jobs:
         - name: vs
           variables:
             dbg_image: yes
-
-        - name: multi-asic-vs
-          variables:
-            dbg_image: yes
             num_asic: 4
-            PLATFORM_AZP: vs
 
         - name: barefoot
           variables:
@@ -107,7 +102,6 @@ jobs:
               make $BUILD_OPTIONS INSTALL_DEBUG_TOOLS=y target/sonic-vs.img.gz && mv target/sonic-vs.img.gz target/sonic-vs-dbg.img.gz
             fi
             make $BUILD_OPTIONS target/docker-sonic-vs.gz target/sonic-vs.img.gz target/docker-ptf.gz
-          elif [ $(GROUP_NAME) == multi-asic-vs ]; then
             sudo echo NUM_ASIC=$(num_asic) > ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf
             asic_id=0
             while [ $asic_id -le $(num_asic) ]; do

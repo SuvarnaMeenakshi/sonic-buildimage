@@ -25,10 +25,9 @@ stages:
     parameters:
       buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) ${{ variables.VERSION_CONTROL_OPTIONS }}'
       jobGroups:
-      - name: multi-asic-vs
+      - name: vs
         variables:
           num_asic: 4
-          PLATFORM_AZP: vs
 
 - stage: Test
   variables:
@@ -86,6 +85,7 @@ stages:
         testRunTitle: vstest
 
   - job:
+    pool: sonictest-t1-lag
     displayName: "kvmtest-multi-asic-t1-lag"
     timeoutInMinutes: 240
 

@@ -17,7 +17,7 @@ steps:
 
 - task: DownloadPipelineArtifact@2
   inputs:
-    artifact: sonic-buildimage.multi-asic-vs
+    artifact: sonic-buildimage.vs
   displayName: "Download sonic-buildimage.vs artifact"
 
 - script: |
