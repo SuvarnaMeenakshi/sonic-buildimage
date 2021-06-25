@@ -42,7 +42,7 @@ steps:
     rm -rf $(Build.ArtifactStagingDirectory)/*
     echo "Reboot DUT"
     sudo virsh reboot ${{ parameters.dut }}
-    sleep 120
+    sleep 180
     CMD="cd /data/sonic-mgmt/tests/; export ANSIBLE_CONFIG=/data/sonic-mgmt/ansible ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible; \
          ./run_tests.sh -c  \"bgp/test_bgp_fact.py\" -d ${{ parameters.dut }} -f $(testbed_file) -i $(inventory) -n ${{ parameters.tbname }} -e --disable_loganalyzer -u"
     echo $CMD
