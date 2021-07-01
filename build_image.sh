@@ -96,6 +96,7 @@ elif [ "$IMAGE_TYPE" = "kvm" ]; then
     echo "Build KVM image"
     KVM_IMAGE_DISK=${OUTPUT_KVM_IMAGE%.gz}
     sudo rm -f $KVM_IMAGE_DISK $KVM_IMAGE_DISK.gz
+    KVM_MASIC_IMAGE_DISK=${KVM_IMAGE_DISK%.img}-masic.img
 
     generate_onie_installer_image
 
@@ -119,6 +120,23 @@ elif [ "$IMAGE_TYPE" = "kvm" ]; then
     }
 
     echo "The compressed kvm image is in $KVM_IMAGE_DISK.gz"
+
+    cp $KVM_IMAGE_DISK.gz $KVM_MASIC_IMAGE_DISK.gz
+    gunzip $KVM_MASIC_IMAGE_DISK.gz
+
+    sudo modprobe nbd max_part=8
+    sudo qemu-nbd --connect=/dev/nbd0 $KVM_MASIC_IMAGE_DISK
+    VM_PARTITION=sudo fdisk /dev/nbd0 -l | grep "Linux filesystem" | awk '{print $1}'
+    mkdir masic_mount
+    sudo mount $VM_PARTITION ./masic_mount
+    sudo unsquashfs ./masic_mount/$IMAGE_VERSION/fs.squashfs
+    j2 asic.conf | sudo tee ./masic_mount/$IMAGE_VERSION/quashfs-root/usr/share/sonic/device/x86_64-kvm_x86_64-r0/asic.conf
+    sudo mksquashfs ./masic_mount/$IMAGE_VERSION/squashfs-root/ ./masic_mount/$IMAGE_VERSION/fs.squashfs -noappend
+    sudo rm -rf ./masic_mount/$IMAGE_VERSION/squashfs-root
+    sudo umount ./masic_mount
+    sudo qemu-nbd --disconnect /dev/nbd0
+    sudo rmmod nbd
+    gzip $KVM_MASIC_IMAGE_DISK
 
 ## Use 'aboot' as target machine category which includes Aboot as bootloader
 elif [ "$IMAGE_TYPE" = "aboot" ]; then
