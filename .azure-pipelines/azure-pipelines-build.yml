@@ -98,6 +98,7 @@ jobs:
       - bash: |
           set -ex
           if [ $(GROUP_NAME) == vs ]; then
+            pip install Jinja2
             python -c "import jinja2;template = jinja2.Template('NUM_ASIC={{NUM_ASIC}}');print(template.render(NUM_ASIC=4))" > ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf
             #sudo echo NUM_ASIC=$(num_asic) > ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf
             asic_id=0
