@@ -17,6 +17,13 @@ steps:
   inputs:
     artifact: sonic-buildimage.vs
   displayName: "Download sonic-buildimage.vs artifact"
+  condition: ne(${{ parameters.tbtype }}, 'multi-asic-t1-lag')
+
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifact: sonic-buildimage.masic-vs
+  displayName: "Download sonic-buildimage.vs artifact"
+  condition: eq(${{ parameters.tbtype }}, 'multi-asic-t1-lag')
 
 - script: |
     set -x
