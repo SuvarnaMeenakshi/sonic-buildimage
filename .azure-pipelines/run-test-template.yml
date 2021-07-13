@@ -21,7 +21,11 @@ steps:
 - script: |
     set -x
     sudo mkdir -p /data/sonic-vm/images
-    sudo cp -v ../target/sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
+    if [[ ${{ parameters.tbtype }} == "multi-asic-t1-lag" ]]; then
+      sudo cp -v ../target/sonic-masic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
+    else
+      sudo cp -v ../target/sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
+    fi
     sudo gzip -fd /data/sonic-vm/images/sonic-vs.img.gz
     username=$(id -un)
     sudo chown -R $username.$username /data/sonic-vm
