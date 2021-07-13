@@ -26,10 +26,6 @@ stages:
       jobGroups:
       - name: vs
       - name: masic-vs
-      - name: broadcom
-        variables:
-          swi_image: yes
-      - name: mellanox
 
 - stage: Test
   variables:
@@ -98,16 +94,3 @@ stages:
         tbname: vms-kvm-t0
         ptf_name: ptf_vms6-1
         tbtype: t0
-
-  - job:
-    pool: sonictest-t1-lag
-    displayName: "kvmtest-t1-lag"
-    timeoutInMinutes: 240
-
-    steps:
-    - template: .azure-pipelines/run-test-template.yml
-      parameters:
-        dut: vlab-03
-        tbname: vms-kvm-t1-lag
-        ptf_name: ptf_vms6-2
-        tbtype: t1-lag
