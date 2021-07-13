@@ -28,6 +28,7 @@ jobs:
       - template: cleanup.yml
       - ${{ parameters. preSteps }}
       - script: |
+          echo $(PLATFORM_AZP)
           if [ -n "$(CACHE_MODE)" ] && echo $(PLATFORM_AZP) | grep -E -q "^(vs|broadcom|mellanox)$"; then
             CACHE_OPTIONS="SONIC_DPKG_CACHE_METHOD=$(CACHE_MODE) SONIC_DPKG_CACHE_SOURCE=/nfs/dpkg_cache/$(PLATFORM_AZP)"
             BUILD_OPTIONS="$(BUILD_OPTIONS) $CACHE_OPTIONS"
@@ -44,6 +45,7 @@ jobs:
           sudo modprobe overlay
           sudo apt-get install -y acl
           sudo bash -c "echo 1 > /proc/sys/vm/compact_memory"
+          echo $(PLATFORM_AZP)
           ENABLE_DOCKER_BASE_PULL=y make PLATFORM=$(PLATFORM_AZP) PLATFORM_ARCH=$(PLATFORM_ARCH) $(BUILD_OPTIONS) configure
         displayName: 'Make configure'
     postSteps:
