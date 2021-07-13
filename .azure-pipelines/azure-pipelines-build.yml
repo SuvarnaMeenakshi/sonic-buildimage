@@ -43,6 +43,12 @@ jobs:
           variables:
             dbg_image: yes
 
+        - name: masic-vs
+          variables:
+            dbg_image: yes
+            PLATFORM_AZP: vs
+            num_asic: 4
+
         - name: barefoot
           variables:
             docker_syncd_rpc_image: yes
@@ -104,6 +110,12 @@ jobs:
               make $BUILD_OPTIONS INSTALL_DEBUG_TOOLS=y target/sonic-vs.img.gz && mv target/sonic-vs.img.gz target/sonic-vs-dbg.img.gz
             fi
             make $BUILD_OPTIONS target/docker-sonic-vs.gz target/sonic-vs.img.gz target/docker-ptf.gz
+          elif [ $(GROUP_NAME) == masic-vs ]; then
+            sudo echo NUM_ASIC=$(num_asic) > ./device/virtual/x86_64-kvm_x86_64-r0/asic.conf
+            if [ $(dbg_image) == yes ]; then
+              make $BUILD_OPTIONS INSTALL_DEBUG_TOOLS=y target/sonic-vs.img.gz && mv target/sonic-vs.img.gz target/sonic-vs-dbg.img.gz
+            fi
+            make $BUILD_OPTIONS target/sonic-vs.img.gz
           else
             if [ $(dbg_image) == yes ]; then
               make  $BUILD_OPTIONS INSTALL_DEBUG_TOOLS=y target/sonic-$(GROUP_NAME).bin && \

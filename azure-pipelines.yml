@@ -44,6 +44,9 @@ stages:
       jobGroups:
       - name: vs
       - name: masic-vs
+        variables:
+          num_asic: 4
+          PLATFORM_AZP: vs
       - name: broadcom
         variables:
           swi_image: yes
