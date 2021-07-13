@@ -26,6 +26,9 @@ stages:
       jobGroups:
       - name: vs
       - name: masic-vs
+        variables:
+          num_asic: 4
+          PLATFORM_AZP: vs
 
 - stage: Test
   variables:
