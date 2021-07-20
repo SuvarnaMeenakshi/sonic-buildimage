@@ -97,9 +97,13 @@ elif [ "$IMAGE_TYPE" = "kvm" ]; then
     KVM_IMAGE_DISK=${OUTPUT_KVM_IMAGE%.gz}
     sudo rm -f $KVM_IMAGE_DISK $KVM_IMAGE_DISK.gz
 
+    KVM_MASIC_IMAGE_DISK=${OUTPUT_MASIC_KVM_IMAGE%.gz}
+    sudo rm -f  $KVM_MASIC_IMAGE_DISK $KVM_MASIC_IMAGE_DISK.gz
+
     generate_onie_installer_image
 
     SONIC_USERNAME=$USERNAME PASSWD=$PASSWORD sudo -E ./scripts/build_kvm_image.sh $KVM_IMAGE_DISK $onie_recovery_image $OUTPUT_ONIE_IMAGE $KVM_IMAGE_DISK_SIZE
+    SONIC_USERNAME=$USERNAME PASSWD=$PASSWORD sudo -E ./scripts/build_kvm_image.sh $KVM_MASIC_IMAGE_DISK $onie_masic_recovery_image $OUTPUT_ONIE_IMAGE $KVM_IMAGE_DISK_SIZE
 
     if [ $? -ne 0 ]; then
         echo "Error : build kvm image failed"
@@ -112,6 +116,7 @@ elif [ "$IMAGE_TYPE" = "kvm" ]; then
     }
 
     gzip $KVM_IMAGE_DISK
+    gzip $KVM_MASIC_IMAGE_DISK
 
     [ -r $KVM_IMAGE_DISK.gz ] || {
         echo "Error : gzip $KVM_IMAGE_DISK failed!"
