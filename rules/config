@@ -198,4 +198,4 @@ REGISTRY_PORT ?= 443
 REGISTRY_SERVER ?= sonicdev-microsoft.azurecr.io
 
 # BUILD_MULTIASIC_KVM - if set to y multi-asic KVM images will be generated.
-DEFAULT_BUILD_MULTIASIC_KVM = n
+BUILD_MULTIASIC_KVM = n
