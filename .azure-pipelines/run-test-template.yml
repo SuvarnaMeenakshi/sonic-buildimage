@@ -7,6 +7,8 @@ parameters:
   type: string
 - name: ptf_name
   type: string
+- name: image
+  type: string
 
 steps:
 - checkout: self
@@ -21,7 +23,7 @@ steps:
 - script: |
     set -x
     sudo mkdir -p /data/sonic-vm/images
-    sudo cp -v ../target/sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
+    sudo cp -v ../target/${{ parameters.ptf_name }} /data/sonic-vm/images/sonic-vs.img.gz
     sudo gzip -fd /data/sonic-vm/images/sonic-vs.img.gz
     username=$(id -un)
     sudo chown -R $username.$username /data/sonic-vm
