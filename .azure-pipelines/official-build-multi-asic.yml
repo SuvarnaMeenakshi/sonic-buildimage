@@ -16,6 +16,7 @@ stages:
       - name: vs
 
 - stage: Test
+  pool: sonictest-t1-lag
   variables:
   - name: inventory
     value: veos_vtb
