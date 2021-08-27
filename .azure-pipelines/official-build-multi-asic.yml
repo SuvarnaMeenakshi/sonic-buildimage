@@ -27,7 +27,7 @@ stages:
 
   jobs:
   - job:
-    pool: sonictest
+    pool: sonictest-t1-lag
     displayName: "kvmtest-multi-asic-t1-lag"
     timeoutInMinutes: 240
 
