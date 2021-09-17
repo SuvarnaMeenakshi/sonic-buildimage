@@ -56,7 +56,7 @@ steps:
     parent_dir="/data/sonic-mgmt"
     CMD="cd $parent_dir/tests/; \
     export ANSIBLE_CONFIG=$parent_dir/ansible ANSIBLE_LIBRARY=$parent_dir/ansible; \
-    ./run_tests.sh -c \"$tests\" -d ${{ parameters.dut }} -f $(testbed_file) -i $(inventory) -n ${{ parameters.tbname }} -e --disable_loganalyzer -e skip_sanity -u"
+    ./run_tests.sh -c \"$tests\" -d ${{ parameters.dut }} -f $(testbed_file) -i $(inventory) -n ${{ parameters.tbname }} -e --disable_loganalyzer -e --skip_sanity -u"
     docker exec sonic-mgmt bash -c "$CMD"
   displayName: "Run tests"
 
