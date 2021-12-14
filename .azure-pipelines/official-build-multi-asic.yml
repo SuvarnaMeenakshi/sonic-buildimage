@@ -1,51 +1,136 @@
 # Starter pipeline
+
 # Start with a minimal pipeline that you can customize to build and deploy your code.
+
 # Add steps that build, run tests, deploy, and more:
+
 # https://aka.ms/yaml
 
-schedules:
-- cron: "0 18 * * Sun,Wed,Fri"
-  displayName: "Alternate day build"
-  branches:
-    include:
-    - master
-  always: true
+pr:
+- master
 
-trigger: none
-pr: none
+name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+parameters:
+- name: dut
+  type: string
+  default: vlab-08
+- name: tbname
+  type: string
+  default: vms-kvm-four-asic-t1-lag
+- name: ptf_name
+  type: string
+  default: ptf_test
+- name: tbtype
+  type: string
+  default: multi-asic-t1-lag
+
+resources:
+  repositories:
+  - repository: sonic-mgmt
+    type: github
+    name: Azure/sonic-mgmt
+    endpoint: build
 
 stages:
-- stage: Build
-  pool: sonicbld
-  variables:
-    CACHE_MODE: wcache
-    ${{ if eq(variables['Build.SourceBranchName'], '202012') }}:
-      VERSION_CONTROL_OPTIONS: 'SONIC_VERSION_CONTROL_COMPONENTS=deb,py2,py3,web'
-  jobs:
-  - template: azure-pipelines-build.yml
-    parameters:
-      buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) BUILD_MULTIASIC_KVM=y ${{ variables.VERSION_CONTROL_OPTIONS }}'
-      jobGroups:
-      - name: vs
-
 - stage: Test
+  pool: sonictest
   variables:
   - name: inventory
     value: veos_vtb
   - name: testbed_file
     value: vtestbed.csv
+  - name: image_file_path
+    value: https://artprodcus3.artifacts.visualstudio.com/Af91412a5-a906-4990-9d7c-f697b81fc04d/be1b070f-be15-4154-aade-b1d3bfb17054/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL21zc29uaWMvcHJvamVjdElkL2JlMWIwNzBmLWJlMTUtNDE1NC1hYWRlLWIxZDNiZmIxNzA1NC9idWlsZElkLzU4OTIxL2FydGlmYWN0TmFtZS9zb25pYy1idWlsZGltYWdlLnZz0/content?format=file&subPath=%2Ftarget%2Fsonic-4asic-vs.img.gz
 
   jobs:
-  - job:
-    pool: sonictest
-    displayName: "kvmtest-multi-asic-t1-lag"
-    timeoutInMinutes: 240
-
+  - job: four_asic_vs_test 
+    displayName: "kvmmultiasictest"
+    timeoutInMinutes: 0
     steps:
-    - template: run-test-template.yml
-      parameters:
-        dut: vlab-08
-        tbname: vms-kvm-four-asic-t1-lag
-        ptf_name: ptf_vms6-4
-        tbtype: multi-asic-t1-lag
-        image: sonic-4asic-vs.img.gz
+
+    - script: |
+        sudo mkdir -p /data/sonic-vm/images
+        wget $(image_file_path)
+        sudo cp -v ./sonic-4asic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
+        sudo gzip -fd /data/sonic-vm/images/sonic-vs.img.gz
+        username=$(id -un)
+        sudo chown -R $username.$username /data/sonic-vm
+        pushd  /data/sonic-mgmt
+        git remote update
+        git reset --hard origin/master
+        docker rm -f sonic-mgmt-masic || true
+        ./setup-container.sh -n sonic-mgmt-masic -d /data
+        sed -i s/use_own_value/${username}/ ansible/veos_vtb
+        echo aaa > ansible/password.txt
+        parent_dir="/data/sonic-mgmt"
+        docker exec sonic-mgmt-masic bash -c "pushd $parent_dir/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ceos refresh-dut ${{ parameters.tbname }} password.txt; ./testbed-cli.sh -m $(inventory) -t $(testbed_file) deploy-mg ${{ parameters.tbname }} veos_vtb password.txt" && sleep 180
+      displayName: "Setup t1-8-lag testbed"
+
+    - script: |
+        # Reboot dut to ensure services are up and stable.
+        echo "Reboot DUT"
+        sudo virsh reboot ${{ parameters.dut }}
+        echo "sleep"
+        sleep 120
+        username=$(id -un)
+        rm -rf $(Build.ArtifactStagingDirectory)/*
+        parent_dir="/data/sonic-mgmt"
+        tests="bgp/test_bgp_fact.py \
+        snmp/test_snmp_pfc_counters.py \
+        snmp/test_snmp_queue.py \
+        snmp/test_snmp_loopback.py \
+        snmp/test_snmp_default_route.py \
+        tacacs/test_rw_user.py \
+        tacacs/test_ro_user.py \
+        tacacs/test_ro_disk.py \
+        tacacs/test_jit_user.py"
+        CMD="cd $parent_dir/tests; \
+        export ANSIBLE_CONFIG=$parent_dir/ansible ANSIBLE_LIBRARY=$parent_dir/ansible; \
+        ./run_tests.sh -c \"$tests\" -d ${{ parameters.dut }} -f $(testbed_file) -i $(inventory) -n ${{ parameters.tbname }} -e --disable_loganalyzer -u"
+        echo $CMD
+        docker exec sonic-mgmt-masic bash -c "$CMD"
+      displayName: "multi-asic t1-lag tests"
+      continueOnError: false
+
+    - script: |
+        # save dut state if test fails
+        virsh_version=$(virsh --version)
+        if [ $virsh_version == "6.0.0" ]; then
+            mkdir -p $(Build.ArtifactStagingDirectory)/kvmdump
+            virsh -c qemu:///system list
+            virsh -c qemu:///system save ${{ parameters.dut }} $(Build.ArtifactStagingDirectory)/kvmdump/${{ parameters.dut }}.memdmp
+            virsh -c qemu:///system dumpxml ${{ parameters.dut }} > $(Build.ArtifactStagingDirectory)/kvmdump/${{ parameters.dut }}.xml
+            img=$(virsh -c qemu:///system domblklist ${{ parameters.dut }} | grep vda | awk '{print $2}')
+            cp $img $(Build.ArtifactStagingDirectory)/kvmdump/${{ parameters.dut }}.img
+            virsh -c qemu:///system undefine ${{ parameters.dut }}
+        fi
+    
+      displayName: "Collect kvmdump"
+      condition: failed()
+    
+    - script: |
+        docker ps
+        pushd  /data/sonic-mgmt
+        cp -r ./tests/logs $(Build.ArtifactStagingDirectory)/
+        username=$(id -un)
+        sudo chown -R $username.$username $(Build.ArtifactStagingDirectory)
+      displayName: "Collect test logs"
+      condition: succeededOrFailed()
+    
+    - publish: $(Build.ArtifactStagingDirectory)/kvmdump
+      artifact: sonic-buildimage.kvmtest.$(tbtype).memdump@$(System.JobAttempt)
+      displayName: "Archive sonic kvm memdump"
+      condition: failed()
+    
+    - publish: $(Build.ArtifactStagingDirectory)/logs
+      artifact: sonic-buildimage.kvmtest.$(tbtype).log@$(System.JobAttempt)
+      displayName: "Archive sonic kvm logs"
+      condition: succeededOrFailed()
+    
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFiles: '$(Build.ArtifactStagingDirectory)/logs/**/*.xml'
+        testRunTitle: kvmtest.$(tbtype)
+      condition: succeededOrFailed()
+
