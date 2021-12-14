@@ -70,10 +70,10 @@ stages:
 
     - script: |
         # Reboot dut to ensure services are up and stable.
-        echo "Reboot DUT"
-        sudo virsh reboot ${{ parameters.dut }}
-        echo "sleep"
-        sleep 120
+        #echo "Reboot DUT"
+        #sudo virsh reboot ${{ parameters.dut }}
+        #echo "sleep"
+        #sleep 120
         username=$(id -un)
         rm -rf $(Build.ArtifactStagingDirectory)/*
         parent_dir="/data/sonic-mgmt"
