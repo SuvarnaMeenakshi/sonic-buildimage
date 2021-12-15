@@ -62,7 +62,7 @@ steps:
     -a False \
     -O \
     -r"
-    cmd = "export ANSIBLE_CONFIG=/data/sonic-mgmt/ansible ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible; /data/sonic-mgmt/tests/run_tests.sh $RUNTEST_CLI_COMMON_OPTS -c \"$tests\" -p logs/multi_asic -e --disable_loganalyzer"
+    cmd="export ANSIBLE_CONFIG=/data/sonic-mgmt/ansible ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible; /data/sonic-mgmt/tests/run_tests.sh $RUNTEST_CLI_COMMON_OPTS -c \"$tests\" -p logs/multi_asic -e --disable_loganalyzer"
     echo $cmd
 
     docker exec sonic-mgmt bash -c $cmd
