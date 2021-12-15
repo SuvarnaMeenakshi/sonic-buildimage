@@ -40,32 +40,21 @@ steps:
 
 - script: |
     rm -rf $(Build.ArtifactStagingDirectory)/*
-    tests="\
-    bgp/test_bgp_fact.py \
+    parent_dir="/data/sonic-mgmt"
+    tests="bgp/test_bgp_fact.py \
     snmp/test_snmp_pfc_counters.py \
     snmp/test_snmp_queue.py \
     snmp/test_snmp_loopback.py \
     snmp/test_snmp_default_route.py \
     tacacs/test_rw_user.py \
     tacacs/test_ro_user.py \
+    tacacs/test_ro_disk.py \
     tacacs/test_jit_user.py"
-
-    RUNTEST_CLI_COMMON_OPTS="\
-    -i veos_vtb \
-    -d vlab-08 \
-    -n vms-kvm-four-asic-t1-lag \
-    -f vtestbed.csv \
-    -k debug \
-    -l warning \
-    -m individual \
-    -q 1 \
-    -a False \
-    -O \
-    -r"
-    cmd="export ANSIBLE_CONFIG=/data/sonic-mgmt/ansible ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible; /data/sonic-mgmt/tests/run_tests.sh $RUNTEST_CLI_COMMON_OPTS -c \"$tests\" -p logs/multi_asic -e --disable_loganalyzer"
-    echo $cmd
-
-    docker exec sonic-mgmt bash -c "$cmd"
+    CMD="cd $parent_dir/tests; \
+    export ANSIBLE_CONFIG=$parent_dir/ansible ANSIBLE_LIBRARY=$parent_dir/ansible; \
+    ./run_tests.sh -c \"$tests\" -d ${{ parameters.dut }} -f $(testbed_file) -i $(inventory) -n ${{ parameters.tbname }} -e --disable_loganalyzer"
+    echo $CMD
+    docker exec sonic-mgmt-masic bash -c "$CMD"
   displayName: "Run tests"
 
 - script: |
