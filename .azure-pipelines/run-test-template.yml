@@ -52,8 +52,8 @@ steps:
 
     RUNTEST_CLI_COMMON_OPTS="\
     -i veos_vtb \
-    -d ${{ parameters.dut }} \
-    -n ${{ parameters.tbname }} \
+    -d vlab-08 \
+    -n vms-kvm-four-asic-t1-lag \
     -f vtestbed.csv \
     -k debug \
     -l warning \
