@@ -20,14 +20,11 @@ steps:
   clean: true
   displayName: 'checkout sonic-mgmt repo'
 
-- task: DownloadPipelineArtifact@2
-  inputs:
-    artifact: sonic-buildimage.vs
-  displayName: "Download sonic-buildimage.vs artifact"
-
 - script: |
+        wget -O sonic-vs.img.gz "https://artprodcus3.artifacts.visualstudio.com/Af91412a5-a906-4990-9d7c-f697b81fc04d/be1b070f-be15-4154-aade-b1d3bfb17054/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL21zc29uaWMvcHJvamVjdElkL2JlMWIwNzBmLWJlMTUtNDE1NC1hYWRlLWIxZDNiZmIxNzA1NC9idWlsZElkLzU4OTIxL2FydGlmYWN0TmFtZS9zb25pYy1idWlsZGltYWdlLnZz0/content?format=file&subPath=%2Ftarget%2Fsonic-4asic-vs.img.gz"
     set -x
     sudo mkdir -p /data/sonic-vm/images
+    sudo cp -v ./sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
     sudo cp -v ../target/${{ parameters.image}} /data/sonic-vm/images/sonic-vs.img.gz
     sudo gzip -fd /data/sonic-vm/images/sonic-vs.img.gz
     username=$(id -un)
@@ -38,7 +35,7 @@ steps:
     git reset --hard origin/master
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
     echo aaa > ansible/password.txt
-    docker exec sonic-mgmt bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ceos refresh-dut ${{ parameters.tbname }} password.txt" && sleep 180
+    docker exec sonic-mgmt bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ceos refresh-dut ${{ parameters.tbname }} password.txt;./testbed-cli.sh -m $(inventory) -t $(testbed_file) deploy-mg ${{ parameters.tbname }} veos_vtb password.txt" && sleep 180
   displayName: "Setup testbed"
 
 - script: |
@@ -65,8 +62,10 @@ steps:
     -a False \
     -O \
     -r"
+    cmd = "export ANSIBLE_CONFIG=/data/sonic-mgmt/ansible ANSIBLE_LIBRARY=/data/sonic-mgmt/ansible; /data/sonic-mgmt/tests/run_tests.sh $RUNTEST_CLI_COMMON_OPTS -c \"$tests\" -p logs/multi_asic -e --disable_loganalyzer"
+    echo $cmd
 
-    docker exec sonic-mgmt bash -c "/data/sonic-mgmt/tests/run_tests.sh $RUNTEST_CLI_COMMON_OPTS -c "$tests" -p logs/$tgname -e --disable_loganalyzer"
+    docker exec sonic-mgmt bash -c $cmd
   displayName: "Run tests"
 
 - script: |
