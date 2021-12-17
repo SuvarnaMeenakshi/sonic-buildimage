@@ -43,11 +43,6 @@ steps:
 
 - script: |
     rm -rf $(Build.ArtifactStagingDirectory)/*
-    docker exec sonic-mgmt bash -c "/data/sonic-mgmt/tests/kvmtest.sh -en -T ${{ parameters.tbtype }} ${{ parameters.tbname }} ${{ parameters.dut }}"
-  displayName: "Run tests"
-
-- script: |
-    rm -rf $(Build.ArtifactStagingDirectory)/*
     parent_dir="/data/sonic-mgmt"
     tests="bgp/test_bgp_fact.py \
     snmp/test_snmp_pfc_counters.py \
