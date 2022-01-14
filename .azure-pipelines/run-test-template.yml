@@ -26,9 +26,10 @@ steps:
   displayName: "Download sonic-buildimage.vs artifact"
 
 - script: |
+    wget -O sonic-vs.img.gz "https://artprodcus3.artifacts.visualstudio.com/Af91412a5-a906-4990-9d7c-f697b81fc04d/be1b070f-be15-4154-aade-b1d3bfb17054/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL21zc29uaWMvcHJvamVjdElkL2JlMWIwNzBmLWJlMTUtNDE1NC1hYWRlLWIxZDNiZmIxNzA1NC9idWlsZElkLzY0NzY1L2FydGlmYWN0TmFtZS9zb25pYy1idWlsZGltYWdlLnZz0/content?format=file&subPath=%2Ftarget%2Fsonic-4asic-vs.img.gz"
     set -x
     sudo mkdir -p /data/sonic-vm/images
-    sudo cp -v ../target/${{ parameters.image}} /data/sonic-vm/images/sonic-vs.img.gz
+    sudo cp -v ./sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
     sudo gzip -fd /data/sonic-vm/images/sonic-vs.img.gz
     username=$(id -un)
     sudo chown -R $username.$username /data/sonic-vm
@@ -38,12 +39,26 @@ steps:
     git reset --hard origin/master
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
     echo aaa > ansible/password.txt
-    docker exec sonic-mgmt bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ceos refresh-dut ${{ parameters.tbname }} password.txt" && sleep 180
+    docker exec sonic-mgmt bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ceos refresh-dut ${{ parameters.tbname }} password.txt;./testbed-cli.sh -m $(inventory) -t $(testbed_file) deploy-mg ${{ parameters.tbname }} veos_vtb password.txt" && sleep 180
   displayName: "Setup testbed"
 
 - script: |
     rm -rf $(Build.ArtifactStagingDirectory)/*
-    docker exec sonic-mgmt bash -c "/data/sonic-mgmt/tests/kvmtest.sh -en -T ${{ parameters.tbtype }} ${{ parameters.tbname }} ${{ parameters.dut }}"
+    parent_dir="/data/sonic-mgmt"
+    tests="bgp/test_bgp_fact.py \
+    snmp/test_snmp_pfc_counters.py \
+    snmp/test_snmp_queue.py \
+    snmp/test_snmp_loopback.py \
+    snmp/test_snmp_default_route.py \
+    tacacs/test_rw_user.py \
+    tacacs/test_ro_user.py \
+    tacacs/test_ro_disk.py \
+    tacacs/test_jit_user.py"
+    CMD="cd $parent_dir/tests; \
+    export ANSIBLE_CONFIG=$parent_dir/ansible ANSIBLE_LIBRARY=$parent_dir/ansible; \
+    ./run_tests.sh -c \"$tests\" -d ${{ parameters.dut }} -f $(testbed_file) -i $(inventory) -n ${{ parameters.tbname }} -e --disable_loganalyzer"
+    echo $CMD
+    docker exec sonic-mgmt bash -c "$CMD"
   displayName: "Run tests"
 
 - script: |
