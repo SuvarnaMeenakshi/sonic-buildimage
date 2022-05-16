@@ -21,7 +21,7 @@ steps:
   displayName: 'checkout sonic-mgmt repo'
 
 - script: |
-    wget -O sonic-vs.img.gz "https://artprodcus3.artifacts.visualstudio.com/Af91412a5-a906-4990-9d7c-f697b81fc04d/be1b070f-be15-4154-aade-b1d3bfb17054/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL21zc29uaWMvcHJvamVjdElkL2JlMWIwNzBmLWJlMTUtNDE1NC1hYWRlLWIxZDNiZmIxNzA1NC9idWlsZElkLzg5MDI2L2FydGlmYWN0TmFtZS9zb25pYy1idWlsZGltYWdlLnZz0/content?format=file&subPath=%2Ftarget%2Fsonic-4asic-vs.img.gz"
+    wget -O sonic-vs.img.gz "https://artprodcus3.artifacts.visualstudio.com/Af91412a5-a906-4990-9d7c-f697b81fc04d/be1b070f-be15-4154-aade-b1d3bfb17054/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL21zc29uaWMvcHJvamVjdElkL2JlMWIwNzBmLWJlMTUtNDE1NC1hYWRlLWIxZDNiZmIxNzA1NC9idWlsZElkLzk4MzIyL2FydGlmYWN0TmFtZS9zb25pYy1idWlsZGltYWdlLnZz0/content?format=file&subPath=%2Ftarget%2Fsonic-4asic-vs.img.gz"
     set -x
     sudo mkdir -p /data/sonic-vm/images
     sudo cp -v ./sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
@@ -34,11 +34,15 @@ steps:
     git reset --hard origin/master
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
     echo aaa > ansible/password.txt
-    docker exec sonic-mgmt bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ceos refresh-dut ${{ parameters.tbname }} password.txt;./testbed-cli.sh -m $(inventory) -t $(testbed_file) deploy-mg ${{ parameters.tbname }} veos_vtb password.txt" && sleep 180 && sudo virsh reboot vlab-08 && sleep 180
+    docker exec sonic-mgmt bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ceos refresh-dut ${{ parameters.tbname }} password.txt;./testbed-cli.sh -m $(inventory) -t $(testbed_file) deploy-mg ${{ parameters.tbname }} veos_vtb password.txt" && sleep 180
   displayName: "Setup testbed"
 
 - script: |
     rm -rf $(Build.ArtifactStagingDirectory)/*
+    echo "reboot DUT"
+    sudo virsh reboot ${{ parameters.dut }}
+    echo "wait for DUT to come up"
+    sleep 180 
     parent_dir="/data/sonic-mgmt"
     tests="bgp/test_bgp_fact.py \
     snmp/test_snmp_pfc_counters.py \
