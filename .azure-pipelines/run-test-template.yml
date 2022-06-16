@@ -44,7 +44,7 @@ steps:
     echo "wait for DUT to come up"
     sleep 180 
     echo "check cpu usage"
-    top -n 3 | grep %Cpu
+    top -b -n 3
     parent_dir="/data/sonic-mgmt"
     tests="bgp/test_bgp_fact.py \
     snmp/test_snmp_pfc_counters.py \
