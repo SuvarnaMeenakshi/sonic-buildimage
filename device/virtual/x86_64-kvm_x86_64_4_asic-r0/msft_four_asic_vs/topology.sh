@@ -5,7 +5,7 @@
 FIRST_FRONTEND_ASIC=0
 LAST_FRONTEND_ASIC=1
 FIRST_BACKEND_ASIC=2
-LAST_BACKEND_ASIC=3
+LAST_BACKEND_ASIC=2
 NUM_INTERFACES_PER_ASIC=8
 
 start () {
@@ -32,9 +32,9 @@ start () {
     # Connect all backend namespaces to frontend namespaces
     for BACKEND in `seq $FIRST_BACKEND_ASIC $LAST_BACKEND_ASIC`; do
         for FRONTEND in `seq $FIRST_FRONTEND_ASIC $LAST_FRONTEND_ASIC`; do
-            for LINK in `seq 1 2`; do
-                FRONT_NAME="eth$((2 * $(($BACKEND - $FIRST_BACKEND_ASIC)) + $LINK + 4))"
-                BACK_NAME="eth$((2 * $FRONTEND + $LINK))"
+            for LINK in `seq 1 4`; do
+                FRONT_NAME="eth$(($LINK + 4))"
+                BACK_NAME="eth$(( $(($FRONTEND * 4)) + $LINK))"
                 echo "$FRONTEND:$FRONT_NAME - $BACKEND:$BACK_NAME"
                 TEMP_BACK="ethBack999"
                 TEMP_FRONT="ethFront999"
@@ -67,8 +67,16 @@ stop() {
         done
     done
 
+    for ASIC in `seq $FIRST_FRONTEND_ASIC $LAST_FRONTEND_ASIC`; do
+        for NUM in `seq 5 8`; do
+            OLD="eth$(($NUM))"
+            echo "sudo ip netns exec asic$ASIC ip link set dev $OLD down"
+            echo "sudo ip netns exec asic$ASIC ip link delete dev eth$NUM"
+        done
+    done
+
     for ASIC in `seq $FIRST_BACKEND_ASIC $LAST_BACKEND_ASIC`; do
-        for NUM in `seq 1 4`; do
+        for NUM in `seq 1 8`; do
             sudo ip netns exec asic$ASIC ip link set dev eth$NUM down
             sudo ip netns exec asic$ASIC ip link delete dev eth$NUM
         done
