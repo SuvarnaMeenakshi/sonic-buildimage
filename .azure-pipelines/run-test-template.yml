@@ -41,7 +41,12 @@ steps:
 
     pushd /data/sonic-mgmt
     git remote update
-    git reset --hard origin/vslite
+    git reset --hard origin/master
+    wget "https://github.com/SuvarnaMeenakshi/sonic-mgmt/blob/7b2393bfa573630f72c2b3adc7e929dc05b2ef38/ansible/vars/topo_msft_four_asic_vs.yml"
+    mv topo_msft_four_asic_vs.yml ansible/vars/
+    wget "https://github.com/SuvarnaMeenakshi/sonic-mgmt/blob/906417968ff013776392a96d79a3a28eb0d24e2a/ansible/veos_vtb"
+    mv veos_vtb ansible/
+    
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
     echo aaa > ansible/password.txt
     docker exec sonic-mgmt bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ${{ parameters.vmtype }} refresh-dut ${{ parameters.tbname }} password.txt" && sleep 180
