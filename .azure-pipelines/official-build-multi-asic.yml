@@ -39,7 +39,7 @@ stages:
   - job:
     pool: sonictest
     displayName: "kvmtest-multi-asic-t1-lag"
-    timeoutInMinutes: 240
+    timeoutInMinutes: 360
 
     steps:
     - template: run-test-template.yml
