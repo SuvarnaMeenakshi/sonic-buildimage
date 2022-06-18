@@ -38,9 +38,9 @@ steps:
     pushd /data/sonic-mgmt
     git remote update
     git reset --hard origin/master
-    wget -O topo_msft_four_asic_vs.yml "https://github.com/SuvarnaMeenakshi/sonic-mgmt/blob/7b2393bfa573630f72c2b3adc7e929dc05b2ef38/ansible/vars/topo_msft_four_asic_vs.yml"
+    wget -O topo_msft_four_asic_vs.yml "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/vars/topo_msft_four_asic_vs.yml"
     mv topo_msft_four_asic_vs.yml ansible/vars/
-    wget -O veos_vtb "https://github.com/SuvarnaMeenakshi/sonic-mgmt/blob/906417968ff013776392a96d79a3a28eb0d24e2a/ansible/veos_vtb"
+    wget -O veos_vtb "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/veos_vtb"
     mv veos_vtb ansible/
     
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
