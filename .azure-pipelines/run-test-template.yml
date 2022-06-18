@@ -26,11 +26,6 @@ steps:
   clean: true
   displayName: 'checkout sonic-mgmt repo'
 
-- task: DownloadPipelineArtifact@2
-  inputs:
-    artifact: sonic-buildimage.vs
-  displayName: "Download sonic-buildimage.vs artifact"
-
 - script: |
     set -x
     sudo mkdir -p /data/sonic-vm/images
