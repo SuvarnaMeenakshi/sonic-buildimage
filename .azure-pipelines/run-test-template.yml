@@ -34,6 +34,7 @@ steps:
 - script: |
     set -x
     sudo mkdir -p /data/sonic-vm/images
+    wget -O sonic-4asic-vs.img.gz "https://artprodcus3.artifacts.visualstudio.com/Af91412a5-a906-4990-9d7c-f697b81fc04d/be1b070f-be15-4154-aade-b1d3bfb17054/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL21zc29uaWMvcHJvamVjdElkL2JlMWIwNzBmLWJlMTUtNDE1NC1hYWRlLWIxZDNiZmIxNzA1NC9idWlsZElkLzExMTU3NS9hcnRpZmFjdE5hbWUvc29uaWMtYnVpbGRpbWFnZS52cw2/content?format=file&subPath=%2Ftarget%2Fsonic-4asic-vs.img.gz"
     sudo cp -v ../target/${{ parameters.image}} /data/sonic-vm/images/sonic-vs.img.gz
     sudo gzip -fd /data/sonic-vm/images/sonic-vs.img.gz
     username=$(id -un)
@@ -42,9 +43,9 @@ steps:
     pushd /data/sonic-mgmt
     git remote update
     git reset --hard origin/master
-    wget "https://github.com/SuvarnaMeenakshi/sonic-mgmt/blob/7b2393bfa573630f72c2b3adc7e929dc05b2ef38/ansible/vars/topo_msft_four_asic_vs.yml"
+    wget -O topo_msft_four_asic_vs.yml "https://github.com/SuvarnaMeenakshi/sonic-mgmt/blob/7b2393bfa573630f72c2b3adc7e929dc05b2ef38/ansible/vars/topo_msft_four_asic_vs.yml"
     mv topo_msft_four_asic_vs.yml ansible/vars/
-    wget "https://github.com/SuvarnaMeenakshi/sonic-mgmt/blob/906417968ff013776392a96d79a3a28eb0d24e2a/ansible/veos_vtb"
+    wget -O veos_vtb "https://github.com/SuvarnaMeenakshi/sonic-mgmt/blob/906417968ff013776392a96d79a3a28eb0d24e2a/ansible/veos_vtb"
     mv veos_vtb ansible/
     
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
