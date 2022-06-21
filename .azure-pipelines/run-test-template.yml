@@ -42,6 +42,8 @@ steps:
     mv topo_msft_four_asic_vs.yml ansible/vars/
     wget -O veos_vtb "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/veos_vtb"
     mv veos_vtb ansible/
+    wget -O lab "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/lab"
+    mv lab ansible/
     
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
     echo aaa > ansible/password.txt
