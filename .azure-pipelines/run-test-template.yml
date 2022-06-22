@@ -26,10 +26,14 @@ steps:
   clean: true
   displayName: 'checkout sonic-mgmt repo'
 
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifact: sonic-buildimage.vs
+  displayName: "Download sonic-buildimage.vs artifact"
+
 - script: |
     set -x
     sudo mkdir -p /data/sonic-vm/images
-    wget -O sonic-vs.img.gz "https://artprodcus3.artifacts.visualstudio.com/Af91412a5-a906-4990-9d7c-f697b81fc04d/be1b070f-be15-4154-aade-b1d3bfb17054/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL21zc29uaWMvcHJvamVjdElkL2JlMWIwNzBmLWJlMTUtNDE1NC1hYWRlLWIxZDNiZmIxNzA1NC9idWlsZElkLzExMTU3NS9hcnRpZmFjdE5hbWUvc29uaWMtYnVpbGRpbWFnZS52cw2/content?format=file&subPath=%2Ftarget%2Fsonic-4asic-vs.img.gz"
     sudo mv sonic-vs.img.gz /data/sonic-vm/images/sonic-vs.img.gz
     sudo gzip -fd /data/sonic-vm/images/sonic-vs.img.gz
     username=$(id -un)

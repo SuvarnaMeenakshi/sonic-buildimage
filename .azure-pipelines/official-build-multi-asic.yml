@@ -8,6 +8,19 @@ trigger: none
 pr: none
 
 stages:
+- stage: Build
+  pool: sonicbld
+  variables:
+  - template: azure-pipelines-repd-build-variables.yml
+  - name: CACHE_MODE
+    value: wcache
+  jobs:
+  - template: azure-pipelines-build.yml
+    parameters:
+      buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) BUILD_MULTIASIC_KVM=y ${{ variables.VERSION_CONTROL_OPTIONS }}'
+      jobGroups:
+      - name: vs
+
 - stage: Test
   variables:
   - name: inventory
