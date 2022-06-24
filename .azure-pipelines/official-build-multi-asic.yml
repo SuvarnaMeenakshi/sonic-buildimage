@@ -34,4 +34,3 @@ stages:
         ptf_name: ptf_vms6-4
         tbtype: multi-asic-t1-lag
         image: sonic-4asic-vs.img.gz
-        vmtype: vsonic
