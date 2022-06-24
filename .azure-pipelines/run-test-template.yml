@@ -46,6 +46,7 @@ steps:
     mv lab ansible/
     wget -O kvmtest.sh "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/tests/kvmtest.sh"
     mv kvmtest.sh tests/
+    sudo chmod +x tests/kvmtest.sh
     
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
     echo aaa > ansible/password.txt
