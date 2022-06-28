@@ -47,6 +47,8 @@ steps:
     wget -O kvmtest.sh "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/tests/kvmtest.sh"
     mv kvmtest.sh tests/
     sudo chmod +x tests/kvmtest.sh
+    wget -O multi_asic.py "https://raw.githubusercontent.com/wenyiz2021/sonic-mgmt/vs2neigh/tests/common/devices/multi_asic.py"
+    mv multi_asic.py tests/common/devices/multi_asic.py
     
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
     echo aaa > ansible/password.txt
