@@ -3,25 +3,6 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-  branches:
-    include:
-      - master
-      - 202012
-  paths:
-    exclude:
-      - .github
-
-pr:
-  branches:
-    include:
-      - master
-      - 202012
-      - bullseye
-  paths:
-    exclude:
-      - .github
-
 name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
 resources:
@@ -53,7 +34,7 @@ stages:
   jobs:
   - template: .azure-pipelines/azure-pipelines-build.yml
     parameters:
-      buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) ${{ variables.VERSION_CONTROL_OPTIONS }}'
+      buildOptions: 'USERNAME=admin SONIC_BUILD_JOBS=$(nproc) BUILD_MULTIASIC_KVM=y ${{ variables.VERSION_CONTROL_OPTIONS }}'
       jobGroups:
       - name: vs
 
@@ -208,3 +189,17 @@ stages:
         ptf_name: ptf_vms6-1
         tbtype: t0-sonic
         vmtype: vsonic
+
+  - job:
+    pool: sonictest
+    displayName: "kvmtest-multi-asic-t1-lag"
+    timeoutInMinutes: 240
+
+    steps:
+    - template: run-test-template.yml
+      parameters:
+        dut: vlab-08
+        tbname: vms-kvm-four-asic-t1-lag
+        ptf_name: ptf_vms6-4
+        tbtype: multi-asic-t1-lag
+        image: sonic-4asic-vs.img.gz
