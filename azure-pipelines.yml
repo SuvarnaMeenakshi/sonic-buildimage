@@ -196,7 +196,7 @@ stages:
     timeoutInMinutes: 240
 
     steps:
-    - template: run-test-template.yml
+    - template: .azure-pipelines/run-test-template.yml
       parameters:
         dut: vlab-08
         tbname: vms-kvm-four-asic-t1-lag
