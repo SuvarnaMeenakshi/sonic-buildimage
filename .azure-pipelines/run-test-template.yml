@@ -45,16 +45,8 @@ steps:
     wget -O kvmtest.sh "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/tests/kvmtest.sh"
     mv kvmtest.sh tests/
     sudo chmod +x tests/kvmtest.sh
-    wget -O sonic.xml.j2 "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/roles/vm_set/templates/sonic.xml.j2"
-    mv sonic.xml.j2 ansible/roles/vm_set/templates/sonic.xml.j2
-    wget -O veos_vtb "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/veos_vtb"
-    mv veos_vtb ansible/veos_vtb
-    wget -O vtestbed.yaml "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/vtestbed.yaml"
-    mv vtestbed.yaml ansible/vtestbed.yaml
-    wget topo_msft_four_asic_vs_lite.yml -O "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/vars/topo_msft_four_asic_vs_lite.yml"
-    mv topo_msft_four_asic_vs_lite.yml ansible/vars/topo_msft_four_asic_vs_lite.yml
-    wget -O topo_t1-3-lag.yml "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/vars/topo_t1-3-lag.yml"
-    mv topo_t1-3-lag.yml ansible/vars/topo_t1-3-lag.yml
+    wget -O topo_t1-8-lag.yml "https://raw.githubusercontent.com/SuvarnaMeenakshi/sonic-mgmt/vs_lite/ansible/vars/topo_t1-8-lag.yml"
+    mv topo_t1-8-lag.yml ansible/vars/topo_t1-8-lag.yml
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
     echo aaa > ansible/password.txt
     docker exec sonic-mgmt bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ${{ parameters.vmtype }} refresh-dut ${{ parameters.tbname }} password.txt" && sleep 180
