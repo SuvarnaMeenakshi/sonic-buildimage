@@ -191,7 +191,7 @@ stages:
         vmtype: vsonic
 
   - job:
-    pool: sonictest
+    pool: sonictest-ma
     displayName: "kvmtest-multi-asic-t1-lag"
     timeoutInMinutes: 240
 
