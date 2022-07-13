@@ -17,19 +17,14 @@ resources:
     endpoint: build
     ref: master
 
-variables:
-- template: .azure-pipelines/azure-pipelines-repd-build-variables.yml
-- ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
-  - template: .azure-pipelines/template-variables.yml
-- ${{ else }}:
-  - template: .azure-pipelines/template-variables.yml@buildimage
-- name: CACHE_MODE
-  value: rcache
-- name: ENABLE_FIPS
-  value: y
-
 stages:
 - stage: Test
+  variables:
+  - name: inventory
+    value: veos_vtb
+  - name: testbed_file
+    value: vtestbed.csv
+
   - job:
     pool: sonictest-ma
     displayName: "kvmtest-multi-asic-t1-lag"
