@@ -28,8 +28,14 @@ steps:
 
 - task: DownloadPipelineArtifact@2
   inputs:
+    source: specific
+    project: build
+    pipeline: 1
     artifact: sonic-buildimage.vs
-  displayName: "Download sonic-buildimage.vs artifact"
+    runVersion: 'latestFromBranch'
+    runBranch: 'refs/heads/master'
+    allowPartiallySucceededBuilds: true
+  displayName: "Download sonic kvm image"
 
 - script: |
     set -x
