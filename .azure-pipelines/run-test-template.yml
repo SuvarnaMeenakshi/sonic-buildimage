@@ -38,16 +38,16 @@ steps:
     git remote update
     git reset --hard origin/master
     chmod +x tests/snmp/test_snmp_default_route.py 
-    docker rm -f sonic-mgmt || true
-    ./setup-container.sh -n sonic-mgmt -m /data/sonic-mgmt -d /data/sonic-mgmt
+    docker rm -f sonic-mgmt-2 || true
+    ./setup-container.sh -n sonic-mgmt-2 -d /data
     sed -i s/use_own_value/${username}/ ansible/veos_vtb
     echo aaa > ansible/password.txt
-    docker exec sonic-mgmt bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ${{ parameters.vmtype }} refresh-dut ${{ parameters.tbname }} password.txt" && sleep 180
+    docker exec sonic-mgmt-2 bash -c "pushd /data/sonic-mgmt/ansible;./testbed-cli.sh -d /data/sonic-vm -m $(inventory) -t $(testbed_file) -k ${{ parameters.vmtype }} refresh-dut ${{ parameters.tbname }} password.txt" && sleep 180
   displayName: "Setup testbed"
 
 - script: |
     rm -rf $(Build.ArtifactStagingDirectory)/*
-    docker exec sonic-mgmt bash -c "/data/sonic-mgmt/tests/kvmtest.sh -en -T ${{ parameters.tbtype }} ${{ parameters.tbname }} ${{ parameters.dut }} ${{ parameters.section }}"
+    docker exec sonic-mgmt-2 bash -c "/data/sonic-mgmt/tests/kvmtest.sh -en -T ${{ parameters.tbtype }} ${{ parameters.tbname }} ${{ parameters.dut }} ${{ parameters.section }}"
   displayName: "Run tests"
   ${{ if eq(parameters.tbtype, 'multi-asic-t1-lag-pr') }}:
       continueOnError: true
