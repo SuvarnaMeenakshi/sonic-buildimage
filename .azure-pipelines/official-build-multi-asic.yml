@@ -4,6 +4,12 @@
 # https://aka.ms/yaml
 
 
+- cron: "0 0-23/2 * * *"
+  displayName: "run every 2 hours"
+  branches:
+    include:
+    - check_masic_test
+
 trigger: none
 pr: none
 
