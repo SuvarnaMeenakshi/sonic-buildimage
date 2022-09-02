@@ -9,7 +9,8 @@ schedules:
   branches:
     include:
     - check_masic_test
-
+  always: true
+  
 trigger: none
 pr: none
 
